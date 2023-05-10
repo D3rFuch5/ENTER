@@ -1,5 +1,9 @@
-# ENTER_Entscheidungsbaum-Ersteller Beta 1.2 (fürher: Simulator-Entscheidungsbaum)
-  <img align="right" src="https://user-images.githubusercontent.com/114241060/232802139-b794d2f0-3e00-4a21-9ab7-8d5df0f077a3.png" width="300" height="300"/>
+# ENTER - ENTscheidungsbaum-ERsteller Beta 1.2 (fürher: Simulator-Entscheidungsbaum)
+<img align="right" src="https://user-images.githubusercontent.com/114241060/232802139-b794d2f0-3e00-4a21-9ab7-8d5df0f077a3.png" width="300" height="300"/>
+
+```diff
+@@Hinweis: Aufgrund der Umbenennung sind noch nicht alle Dateien aktuell. Sobald dies der Fall ist, wird dieser Hinweis entfernt.@@
+```
 
 Für die didaktische Simulation des Entscheidungsbaum-Algorithmus wurde der Entscheidungsbaum-Ersteller ENTER entwickelt. Die Software kann als Hilfsmittel bei der Umsetzung des Themas Entscheidungsbaum des LehrplanPLUS-Kapitels 11.4 Künstliche Intelligenz des bayerischen Lehrplans dienen. Sie eignet sich sowohl um die Trainings- und Testphase des Algorithmus maschinellen Lernens zu simulieren, als auch um den Einfluss von Trainingsdaten und Parametern auf die Zuverlässigkeit der Ergebnisse des Entscheidungsbaum-Algorithmus zu untersuchen.
 
