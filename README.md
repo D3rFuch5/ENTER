@@ -1,4 +1,4 @@
-# ENTER_Entscheidungsbaum-Ersteller Beta 1.2 (fürher: Simulator-Entscheidungsbaum)
+# ENTER_ENTscheidungsbaum-ERsteller Beta 1.2 (fürher: Simulator-Entscheidungsbaum)
   <img align="right" src="https://user-images.githubusercontent.com/114241060/232802139-b794d2f0-3e00-4a21-9ab7-8d5df0f077a3.png" width="300" height="300"/>
 
 ```diff
