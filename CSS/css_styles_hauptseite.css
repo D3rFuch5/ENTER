@@ -144,6 +144,14 @@ h1{
     color: black;
 }
 
+h2{
+    margin-bottom: 5px;
+    font-family: 'Comic Sans MS', cursive;
+    font-weight: bold;
+    font-size: 30px;
+    color: black;
+}
+
 p{
     text-align: justify;
     line-height: 1.5;
@@ -154,6 +162,12 @@ p{
     height: 200px;
     float: right;
     margin: 15px;
+}
+
+.screenshot{
+    display: block;
+    margin: 20px auto;
+    width: 90%;
 }
 
 
