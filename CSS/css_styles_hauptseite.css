@@ -1,0 +1,159 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: Verdana, sans-serif;
+}
+
+body {
+    background-color: white;
+}
+
+#logo_ENTER {
+    margin: 10px 10px 10px 5px;
+    width: 50px;
+    height: 50px;
+}
+
+#logo_entwickler {
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+nav {
+    margin-top: 0px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    background-color: rgba(200, 200, 200, 0.3);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0px 5px 5px grey;
+
+}
+
+#div_ENTER {
+    display: flex;
+    align-items: center;
+}
+
+#schriftzug_ENTER {
+    font-family: 'Comic Sans MS', cursive;
+    font-weight: bold;
+    font-size: 25px;
+    color: black;
+}
+
+#navigation_bar {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-left: auto;
+    margin-right: 15px;
+}
+
+.level_one_tab {
+    position: relative;
+    color: black;
+    text-transform: uppercase;
+    margin-right: 20px;
+}
+
+#navigation_bar a:hover {
+    color: blue;
+}
+
+#current_tab {
+    font-weight: bold;
+    text-decoration: underline;
+    text-underline-offset: 10px;
+    text-decoration-style: solid;
+    text-decoration-thickness: 3px;
+}
+
+.other_tab{
+    font-weight: normal;
+    text-decoration: none;
+
+}
+
+.other_tab::after {
+    content: "";
+    height: 3px;
+    width: 0;
+    background: blue;
+    position: absolute;
+    left: 0;
+    bottom: -10px;
+    transition: 0.5s;
+}
+
+.other_tab:hover::after {
+    width: 100%;
+}
+
+/* The dropdown container */
+.dropdown {
+    display: inline;
+    overflow: hidden;
+    font-size: inherit;
+    border: none;
+    outline: none;
+    color: white;
+    font-family: inherit; /* Important for vertical align on mobile phones */
+}
+
+
+
+/* Dropdown content (hidden by default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 120px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    position: relative;
+    color: black;
+    margin: 10px 20px 20px 10px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+#div_site_body{
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+h1{
+    font-family: 'Comic Sans MS', cursive;
+    font-weight: bold;
+    font-size: 35px;
+    color: black;
+}
+
+p{
+    text-align: justify;
+    line-height: 1.5;
+}
+
+.image_in_text{
+    width: 200px;
+    height: 200px;
+    float: right;
+    margin: 15px;
+}
+
+
