@@ -8,4 +8,4 @@ Die Software bietet sowohl die Möglichkeit einen Entscheidungsbaum unter Verwen
 
 Ausführliche Informationen zur Installation und Verwendung der Software finden Sie im Handbuch zum ENTER, welches auch in diesem Repository abrufbar ist.
 <p align="center">
- <img src="https://user-images.githubusercontent.com/114241060/232804832-c5cb0124-6afb-43bb-b9cb-69130d6e32d7.png" width="749" height="539" />
+ <img src="https://github.com/D3rFuch5/ENTER/assets/114241060/6a626b22-7544-418d-b93f-e0ccdead669a" width="749" height="539" />
