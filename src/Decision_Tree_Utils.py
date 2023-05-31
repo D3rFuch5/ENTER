@@ -12,7 +12,9 @@ def calculate_best_attribute(split_criterion, header, data):
     """
     information_gains = calculate_information_gains(split_criterion=split_criterion,
                                                     header=header, data=data)
-    return max(information_gains, key=information_gains.get), information_gains
+    best_attribute = max(information_gains, key=information_gains.get)
+    information_gain_best_attribute = information_gains[best_attribute]
+    return best_attribute, information_gain_best_attribute, information_gains
 
 
 def split_data_by_attribute(dataset, split_attribute):

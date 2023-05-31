@@ -49,20 +49,21 @@ class Main:
 
         self.selected_filepath_data = ""
         self.header_used_training_data = []
-        self.data_used_training_data = [[]]
+        self.data_used_training_data = []
 
         self.selected_filepath_test_data = ""
         self.header_used_test_data = []
-        self.data_used_test_data = [[]]
+        self.data_used_test_data = []
 
         self.read_in_header = []
-        self.read_in_dataset = [[]]
+        self.read_in_dataset = []
 
         # Statusvariable zum Speichern, ob die Testphase gerade aktiv
         self.test_phase_activated = False
 
-        # Statusvariable zum Anzeigen des Hinweises zur autom. Datenaufteilung
-        self.notification_data_sampler_displayed = False
+        # Variable, welche die momentane Aufteilungsrate des Data Samplers beinhaltet (damit nicht bei jeder Verwendung
+        # neu geparst werden muss)
+        self.current_entered_training_data_ratio = self.default_TRAINING_DATA_RATIO
 
     def call_open_file_training_data(self, lbl):
         # Dataset Window zurücksetzen und ausblenden
@@ -82,25 +83,29 @@ class Main:
             self.read_in_header, self.read_in_dataset = CSV_Reader.read_in_csv(
                 self.selected_filepath_data)
             lbl["text"] = f"{os.path.basename(self.selected_filepath_data)}"
-            # Data Sampler ist aktiv
+            # Data Sampler ist aktiv, d.h. es muss es ist eine zugelassene Aufteilungsrate eingegeben worden
             if self.my_gui.use_data_sampling.get() == 1:
+                # Setzen der Header der Trainings- und Testdaten auf die eingelesenen Daten
                 self.header_used_training_data = self.read_in_header
                 self.header_used_test_data = self.read_in_header
-                self.data_used_training_data, self.data_used_test_data = self.data_sampling_split_data_by_entered_ratio(
-                    data=copy.deepcopy(self.read_in_dataset))
+                self.data_used_training_data, self.data_used_test_data = Data_Sampler.split_data_according_to_ratio(
+                    data=copy.deepcopy(self.read_in_dataset), ratio=self.current_entered_training_data_ratio)
             # Data Sampler nicht aktiv
             else:
                 self.header_used_training_data = self.read_in_header
                 self.data_used_training_data = self.read_in_dataset
             GUI.fill_treeview_with_data(treeview=self.my_gui.treeview_training_data,
-                                        data=[self.header_used_training_data] + self.data_used_training_data)
+                                        dataset=[self.header_used_training_data] + self.data_used_training_data)
+            GUI.display_treeview_from_beginning(treeview=self.my_gui.treeview_training_data)
         except Exceptions.EmptyFileException:
             err_msg = "Die eingelesene Datei war leer!"
             self.selected_filepath_data = ""
+            self.read_in_header = []
+            self.read_in_dataset = []
             self.header_used_training_data = []
-            self.data_used_training_data = [[]]
+            self.data_used_training_data = []
             self.header_used_test_data = []
-            self.data_used_test_data = [[]]
+            self.data_used_test_data = []
             self.my_gui.lbl_display_selected_filepath_training_data['text'] = ""
             messagebox.showerror(parent=self.my_gui.main_window, title="Fehler", message=err_msg)
         except Exception:
@@ -108,12 +113,20 @@ class Main:
             if self.selected_filepath_data == "":
                 err_msg = "Es wurde keine Datei ausgewählt!"
             self.selected_filepath_data = ""
+            self.read_in_header = []
+            self.read_in_dataset = []
             self.header_used_training_data = []
-            self.data_used_training_data = [[]]
+            self.data_used_training_data = []
             self.header_used_test_data = []
-            self.data_used_test_data = [[]]
+            self.data_used_test_data = []
             self.my_gui.lbl_display_selected_filepath_training_data['text'] = ""
             messagebox.showerror(parent=self.my_gui.main_window, title="Fehler", message=err_msg)
+        # Aktualisieren der Anzeige der Elementanzahl der Trainingsdaten
+        self.my_gui.frm_display_training_data['text'] = "Geladene Trainingsdaten(" + str(
+            len(self.data_used_training_data)) + " Elemente):"
+        # Aktualisieren der Anzeige der Elementanzahl der Testdaten
+        self.my_gui.frm_display_test_data['text'] = "Testdaten(" + str(
+            len(self.data_used_test_data)) + " Elemente):"
 
     def call_open_file_test_data(self, lbl):
         GUI.clear_treeview(treeview=self.my_gui.treeview_test_data)
@@ -127,12 +140,13 @@ class Main:
                 self.selected_filepath_test_data)
             lbl["text"] = f"{os.path.basename(self.selected_filepath_test_data)}"
             GUI.fill_treeview_with_data(treeview=self.my_gui.treeview_test_data,
-                                        data=[self.header_used_test_data] + self.data_used_test_data)
+                                        dataset=[self.header_used_test_data] + self.data_used_test_data)
+            GUI.display_treeview_from_beginning(treeview=self.my_gui.treeview_test_data)
         except Exceptions.EmptyFileException:
             err_msg = "Die eingelesene Datei war leer!"
             self.selected_filepath_test_data = ""
             self.header_used_test_data = []
-            self.data_used_test_data = [[]]
+            self.data_used_test_data = []
             self.my_gui.lbl_display_selected_filepath_test_data['text'] = ""
             messagebox.showerror(parent=self.my_gui.main_window, title="Fehler", message=err_msg)
         except Exception:
@@ -141,11 +155,14 @@ class Main:
                 err_msg = "Es wurde keine Datei ausgewählt!"
             self.selected_filepath_test_data = ""
             self.header_used_test_data = []
-            self.data_used_test_data = [[]]
+            self.data_used_test_data = []
             self.my_gui.lbl_display_selected_filepath_test_data['text'] = ""
             messagebox.showerror(parent=self.my_gui.main_window, title="Fehler", message=err_msg)
+        # Aktualisieren der Anzeige der Elementanzahl der Testdaten
+        self.my_gui.frm_display_test_data['text'] = "Testdaten(" + str(
+            len(self.data_used_test_data)) + " Elemente):"
 
-    def call_activate_testing_phase(self):
+    def call_activate_test_phase(self):
         if self.my_Tree is not None:
             self.test_phase_activated = not self.test_phase_activated
             self.my_gui.disable_inputs_training_phase(disable_inputs=self.test_phase_activated)
@@ -155,7 +172,8 @@ class Main:
                 # Anzeigen der bereits vorliegenden Testdaten durch den Data Sampler
                 if self.my_gui.use_data_sampling.get() == 1:
                     GUI.fill_treeview_with_data(treeview=self.my_gui.treeview_test_data,
-                                                data=[self.header_used_test_data] + self.data_used_test_data)
+                                                dataset=[self.header_used_test_data] + self.data_used_test_data)
+                    GUI.display_treeview_from_beginning(treeview=self.my_gui.treeview_test_data)
                     self.my_gui.btn_choose_test_data['state'] = tk.DISABLED
                     self.my_gui.lbl_display_selected_filepath_test_data[
                         'text'] = "  Automatisch aus den geladenen Daten entnommen."
@@ -178,7 +196,11 @@ class Main:
                 # des Testmodus gelöscht
                 if self.my_gui.use_data_sampling.get() != 1:
                     self.header_used_test_data = []
-                    self.data_used_test_data = [[]]
+                    self.data_used_test_data = []
+
+                # Aktualisieren der Anzeige der Elementanzahl der Testdaten
+                self.my_gui.frm_display_test_data['text'] = "Testdaten(" + str(
+                    len(self.data_used_test_data)) + " Elemente):"
 
                 # Ausblenden der Tabs des Testmodus
                 self.my_gui.main_notebook.hide(self.tab_TEST_PHASE)
@@ -190,10 +212,8 @@ class Main:
                                  message="Es ist aktuell kein Baum trainiert!")
 
     def call_perform_testing(self):
-        if self.data_used_test_data != [[]]:
+        if self.data_used_test_data != []:
             GUI.clear_treeview_without_header(treeview=self.my_gui.treeview_test_data_results)
-            # Zum ersten Element springen
-            GUI.display_treeview_from_beginning(treeview=self.my_gui.treeview_test_data)
 
             label_column_test_data = [row[-1] for row in self.data_used_test_data]
             calculated_labels = self.my_Tree.calculate_labels_test_data(
@@ -202,6 +222,10 @@ class Main:
             GUI.fill_treeview_with_calculated_labels(treeview=self.my_gui.treeview_test_data_results,
                                                      calculated_labels=calculated_labels,
                                                      label_column=label_column_test_data)
+
+            # Zum ersten Element springen
+            GUI.display_treeview_from_beginning(treeview=self.my_gui.treeview_test_data)
+            GUI.display_treeview_from_beginning(treeview=self.my_gui.treeview_test_data_results)
 
             unique_labels = Decision_Tree_Utils.unique_list([row[-1] for row in self.data_used_training_data])
             unique_labels.sort()
@@ -250,7 +274,7 @@ class Main:
             self.my_gui.node_details_window.close_node_details_window(main_gui=self.my_gui)
 
         # Falls keine Daten geladen sind...
-        if self.header_used_training_data == [] or self.data_used_training_data == [[]]:
+        if self.header_used_training_data == [] or self.data_used_training_data == []:
             messagebox.showerror(parent=self.my_gui.main_window, title="Fehler", message="Es sind keine Daten geladen!")
         # Trainingsdaten liegen vor
         else:
@@ -258,24 +282,19 @@ class Main:
             err_msg, entered_tree_depth, entered_purity_level, entered_min_element_number = self.check_inputs_train_tree()
 
             # Neu würfeln der automatischen Datenaufteilung
-            # Nur wenn die Option des neu würfelns aktiv ist, wird bei Baumerstellung neu gewürfelt und es muss die
-            # Eingabe der Trainingsdatenrate neu geprüft werden
+            # Nur wenn die Option des neu würfelns aktiv ist, wird bei Baumerstellung neu gewürfelt
+            # Die Aufteilungsrate ist fest, da die Eingabe gesperrt ist
             if self.my_gui.use_shuffle_on_tree_creation.get() == 1:
-                error, entered_ratio = self.check_input_data_sampler_training_data_ratio()
-                # Einlesen der neuen Trainingsdatenrate für die Datenaufteilung hat korrekt funktioniert
-                if error == "":
-                    # Die Header werden direkt bei Öffnen einer Datei oder Aktivierung des Datasamplers gesetzt.
-                    # Es müssen also nur die Daten gesetzt werden.
-                    self.data_used_training_data, self.data_used_test_data = Data_Sampler.split_data_according_to_ratio(
-                        data=copy.deepcopy(self.read_in_dataset), ratio=entered_ratio, do_shuffle=True)
-                    # Aktualisierung der Anzeige mit den aktuellen Daten
-                    GUI.clear_treeview(treeview=self.my_gui.treeview_training_data)
-                    GUI.fill_treeview_with_data(treeview=self.my_gui.treeview_training_data,
-                                                data=[self.header_used_training_data] + self.data_used_training_data)
-                # Falls keine korrekte Rate eingelesen werden konnte, bleiben die alten Trainingsdaten erhalten
-                # und die Fehlermeldung wird ergänzt.
-                else:
-                    err_msg += error
+                # Die Header werden direkt bei Öffnen einer Datei oder Aktivierung des Data Samplers gesetzt.
+                # Es müssen also nur die Daten gesetzt werden.
+                self.data_used_training_data, self.data_used_test_data = Data_Sampler.split_data_according_to_ratio(
+                    data=copy.deepcopy(self.read_in_dataset), ratio=self.current_entered_training_data_ratio,
+                    do_shuffle=True)
+                # Aktualisierung der Anzeige mit den aktuellen Daten
+                GUI.clear_treeview(treeview=self.my_gui.treeview_training_data)
+                GUI.fill_treeview_with_data(treeview=self.my_gui.treeview_training_data,
+                                            dataset=[self.header_used_training_data] + self.data_used_training_data)
+                GUI.display_treeview_from_beginning(treeview=self.my_gui.treeview_training_data)
 
             # Kein Fehler beim Einlesen der Hyperparameter.
             # Nicht ausgewählte Hyperparameter werden auf Wert gesetzt, der keinen Einfluss hat
@@ -302,7 +321,8 @@ class Main:
                         selected_split_criterion=self.my_gui.selected_split_criterion.get(),
                         max_tree_depth=entered_tree_depth,
                         min_element_number_for_node=entered_min_element_number,
-                        min_purity_level=entered_purity_level)
+                        min_purity_level=entered_purity_level,
+                        split_only_for_information_gain_greater_zero=self.my_gui.use_only_split_for_real_information_gain.get())
                     # Erstellen der Grafik, welche den Entscheidungsbaum darstellt
                     self.my_Tree.build_tree_graphic()
                     # Anzeigen der Entscheidungsbaumgrafik in der Oberfläche
@@ -326,13 +346,23 @@ class Main:
         self.my_gui.main_notebook.select(self.tab_DISPLAY_TREE)
 
     def call_show_window_node_details(self):
+        """
+        Regelt den Aufruf der Anzeige des Knotendetail-Fensters. Erzeugt ggf. das Fenster und zeigt dem Nutzer
+        einen Fehler an, falls kein Baum trainiert ist
+        """
         if self.my_Tree is not None:
+            # Anzeige des Knotendetail-Fensters
             if self.my_gui.show_window_node_details.get() == 1:
                 if self.my_gui.node_details_window is None:
                     self.my_gui.node_details_window = GUI.GUI_Node_Details_Window(self.my_gui, self)
                 else:
+                    # Es wird vorausgesetzt, dass beim Ausblenden des Fensters dieses wieder auf den Initialzustand
+                    # gesetzt wurde
                     self.my_gui.node_details_window.show_node_details_window()
-            elif self.my_gui.node_details_window is not None:
+            # Ausblenden des Knotendetail-Fensters
+            else:
+                # Da initial die Option Kontendetails anzeigen deaktiviert ist, kann davon ausgegangen werden, das
+                # vorher das Fenster bereits durch Aktivierung der Option erzeugt wurde
                 self.my_gui.node_details_window.close_node_details_window(main_gui=self.my_gui)
         else:
             self.my_gui.show_window_node_details.set(0)
@@ -341,8 +371,12 @@ class Main:
 
     def call_display_node_details(self):
         number_node_to_display = self.default_NODE_NUMBER
+        # Leeren der Anzeige
         GUI.clear_treeview(treeview=self.my_gui.node_details_window.treeview_data)
         GUI.clear_treeview(treeview=self.my_gui.node_details_window.treeview_information_gains)
+        self.my_gui.node_details_window.lbl_best_attribute_value['text'] = ""
+
+        # Prüfen der eingegebenen Knotennummer auf Sinnhaftigkeit
         err_msg = ""
         try:
             number_node_to_display = int(self.my_gui.node_details_window.entered_node_number.get())
@@ -355,23 +389,44 @@ class Main:
             err_msg += "Die eingegebene Knotennummer darf keine negative Zahl sein!\n"
             self.my_gui.node_details_window.entered_node_number.set(self.default_NODE_NUMBER)
 
+        elements_in_node_dataset = 0
         if err_msg == "":
             node_to_display = self.my_Tree.search_by_node_number(number_node_to_display)
             if node_to_display is not None:
                 GUI.fill_treeview_with_data(treeview=self.my_gui.node_details_window.treeview_data,
-                                            data=node_to_display.node_dataset)
-                self.my_gui.node_details_window.display_information_gains(current_node=node_to_display,
-                                                                          type_InnerNode=Decision_Tree.InnerNode)
+                                            dataset=node_to_display.node_dataset)
+                GUI.display_treeview_from_beginning(treeview=self.my_gui.node_details_window.treeview_data)
+
+                # Falls der Knoten ein innerer Knoten ist...
+                if isinstance(node_to_display, Decision_Tree.InnerNode):
+                    # ... Füllen der Anzeige und Einblenden
+                    self.my_gui.node_details_window.fill_information_gains_and_best_attribute(
+                        current_node=node_to_display)
+                    self.my_gui.node_details_window.frm_display_information_gains.grid(column=0, row=1, padx=(5, 5),
+                                                                                       sticky="ew", pady=(15, 0))
+                # Falls der Knoten ein Blattknoten ist...
+                else:
+                    # Ausblenden der Anzeige
+                    self.my_gui.node_details_window.frm_display_information_gains.grid_forget()
+                elements_in_node_dataset = len(node_to_display.node_dataset[1:])
             else:
+                self.my_gui.node_details_window.frm_display_information_gains.grid(column=0, row=1, padx=(5, 5),
+                                                                                   sticky="ew", pady=(15, 0))
                 messagebox.showerror(parent=self.my_gui.node_details_window.window, title="Fehler",
                                      message="Die eingegebene Knotennummer gehört zu keinem Knoten im aktuellen Baum!")
         else:
+            self.my_gui.node_details_window.frm_display_information_gains.grid(column=0, row=1, padx=(5, 5),
+                                                                               sticky="ew", pady=(15, 0))
             messagebox.showerror(parent=self.my_gui.node_details_window.window, title="Fehler", message=err_msg)
+        # Aktualisieren der Anzeige der Elementanzahl der Knotendaten
+        self.my_gui.node_details_window.frm_display_data['text'] = "Daten des Knotens(" + str(
+            elements_in_node_dataset) + " Elemente):"
 
     def call_data_sampling_use(self):
         # Aufruf, wenn der Data Sampler deaktiviert wird
         if self.my_gui.use_data_sampling.get() == 0:
             # GUI-Anpassung
+            self.my_gui.etr_training_data_ratio['state'] = tk.NORMAL
             self.my_gui.use_shuffle_on_tree_creation.set(0)
             self.my_gui.frm_choose_training_data['text'] = "W\u00E4hlen Sie die Trainingsdaten aus:"
 
@@ -380,25 +435,52 @@ class Main:
             self.header_used_training_data = self.read_in_header
             self.data_used_training_data = self.read_in_dataset
             self.header_used_test_data = []
-            self.data_used_test_data = [[]]
+            self.data_used_test_data = []
+        # Aufruf, wenn der Data Sampler aktiviert wird
         else:
             self.my_gui.frm_choose_training_data['text'] = "W\u00E4hlen Sie die Daten aus:"
             # Setzen der Header-Zeilen von Trainings- und Testdaten
             self.header_used_training_data = self.read_in_header
             self.header_used_test_data = self.read_in_header
-            # Aufteilung der eingelesenen Daten in Trainings- und Testdaten mit dem Data Sampler
-            self.data_used_training_data, self.data_used_test_data = self.data_sampling_split_data_by_entered_ratio(
-                data=copy.deepcopy(self.read_in_dataset))
-            if not self.notification_data_sampler_displayed:
-                self.notification_data_sampler_displayed = True
-                messagebox.showinfo(parent=self.my_gui.main_window, title="Hinweis",
-                                    message="Ein neuer Prozentsatz für die Datenaufteilung wird erst bei erneuter "
-                                            "Aktivierung dieser Option aktiv")
+
+            # Sperren der Eingabe einer Aufteilungsrate
+            self.my_gui.etr_training_data_ratio['state'] = tk.DISABLED
+            # Prüfen der Eingabe für die Aufteilungsrate
+            err_msg, entered_ratio = self.check_input_data_sampler_training_data_ratio()
+
+            if err_msg == "":
+                # Aufteilung der eingelesenen Daten in Trainings- und Testdaten mit dem Data Sampler
+                self.current_entered_training_data_ratio = entered_ratio
+                self.data_used_training_data, self.data_used_test_data = Data_Sampler.split_data_according_to_ratio(
+                    data=copy.deepcopy(self.read_in_dataset), ratio=self.current_entered_training_data_ratio)
+            else:
+                # Fehlerhafte Eingabe
+                # Zurücksetzen der GUI und der Daten
+                self.my_gui.use_data_sampling.set(0)
+                self.my_gui.use_shuffle_on_tree_creation.set(0)
+                self.my_gui.etr_training_data_ratio['state'] = tk.NORMAL
+                self.my_gui.frm_choose_training_data['text'] = "W\u00E4hlen Sie die Trainingsdaten aus:"
+                self.current_entered_training_data_ratio = self.default_TRAINING_DATA_RATIO
+
+                # Setzen der Trainingsdaten auf alle eingelesenen Daten
+                self.header_used_training_data = self.read_in_header
+                self.data_used_training_data = self.read_in_dataset
+                self.header_used_test_data = []
+                self.data_used_test_data = []
+                messagebox.showerror(parent=self.my_gui.main_window, title="Fehler",
+                                     message=err_msg)
 
         # Aktualisierung der Anzeige mit den aktuellen Daten
         GUI.clear_treeview(treeview=self.my_gui.treeview_training_data)
         GUI.fill_treeview_with_data(treeview=self.my_gui.treeview_training_data,
-                                    data=[self.header_used_training_data] + self.data_used_training_data)
+                                    dataset=[self.header_used_training_data] + self.data_used_training_data)
+        GUI.display_treeview_from_beginning(treeview=self.my_gui.treeview_training_data)
+        # Aktualisieren der Anzeige der Elementanzahl der Trainingsdaten
+        self.my_gui.frm_display_training_data['text'] = "Geladene Trainingsdaten(" + str(
+            len(self.data_used_training_data)) + " Elemente):"
+        # Aktualisieren der Anzeige der Elementanzahl der Testdaten
+        self.my_gui.frm_display_test_data['text'] = "Testdaten(" + str(
+            len(self.data_used_test_data)) + " Elemente):"
         # Zurücksetzen der Baumanzeige
         self.my_Tree = None
         self.my_gui.enter_new_picture(img=tk.PhotoImage(file=self.current_default_image_path))
@@ -407,7 +489,10 @@ class Main:
         if self.my_gui.use_data_sampling.get() != 1:
             self.my_gui.use_shuffle_on_tree_creation.set(0)
             messagebox.showerror(parent=self.my_gui.main_window, title="Fehler",
-                                 message="Die automatische Aufteilung in Trainings- und Testdaten ist nicht aktiv!")
+                                 message="Das Mischen der Daten bei Erstellung des Entscheidungsbaums ist nur bei "
+                                         "aktiver automatischer Aufteilung in Trainings- und Testdaten möglich. "
+                                         "Dafür muss der Anteil der Trainingsdaten durch die zugehörige "
+                                         "Auswahl aktiviert werden.")
 
     def check_input_data_sampler_training_data_ratio(self):
         """
@@ -423,14 +508,14 @@ class Main:
         if self.my_gui.use_data_sampling.get() == 1:
             try:
                 entered_training_data_ratio = int(self.my_gui.entered_training_data_ratio.get())
-                if entered_training_data_ratio < 0 or entered_training_data_ratio > 100:
+                if entered_training_data_ratio < 1 or entered_training_data_ratio > 100:
                     raise Exceptions.OutOfRangeException
             except ValueError:
                 err_msg += "Der eingegebene Prozentsatz der Trainingsdaten ist keine ganze Zahl!\n"
                 self.my_gui.entered_training_data_ratio.set(self.default_TRAINING_DATA_RATIO)
                 entered_training_data_ratio = -1
             except Exceptions.OutOfRangeException:
-                err_msg += "Der eingegebene Prozentsatz der Trainingsdaten liegt nicht im Bereich zwischen 0 und 100!\n"
+                err_msg += "Der eingegebene Prozentsatz der Trainingsdaten liegt nicht im Bereich zwischen 1 und 100!\n"
                 self.my_gui.entered_training_data_ratio.set(self.default_TRAINING_DATA_RATIO)
                 entered_training_data_ratio = -1
         return err_msg, entered_training_data_ratio
@@ -457,14 +542,14 @@ class Main:
         if self.my_gui.use_hyperparameter_purity_level.get() == 1:
             try:
                 entered_purity = int(self.my_gui.entered_purity_level.get())
-                if entered_purity < 0 or entered_purity > 100:
+                if entered_purity < 1 or entered_purity > 100:
                     raise Exceptions.OutOfRangeException
             except ValueError:
                 err_msg += "Das eingegebene Reinheitslevel ist keine ganze Zahl!\n"
                 self.my_gui.entered_purity_level.set(self.default_PURITY_LEVEL)
                 entered_purity = -1
             except Exceptions.OutOfRangeException:
-                err_msg += "Das eingegebene Reinheitslevel liegt nicht im Bereich zwischen 0 und 100!\n"
+                err_msg += "Das eingegebene Reinheitslevel liegt nicht im Bereich zwischen 1 und 100!\n"
                 self.my_gui.entered_purity_level.set(self.default_PURITY_LEVEL)
                 entered_purity = -1
 
@@ -483,17 +568,6 @@ class Main:
                 entered_min_number_of_elements = -1
 
         return err_msg, entered_depth, entered_purity, entered_min_number_of_elements
-
-    def data_sampling_split_data_by_entered_ratio(self, data):
-        err_msg, entered_ratio = self.check_input_data_sampler_training_data_ratio()
-
-        if err_msg == "":
-            training_data, test_data = Data_Sampler.split_data_according_to_ratio(data=data, ratio=entered_ratio)
-        else:
-            training_data = []
-            test_data = []
-            messagebox.showerror(parent=self.my_gui.main_window, title="Fehler", message=err_msg)
-        return training_data, test_data
 
     def start(self):
         self.my_gui.main_window.mainloop()

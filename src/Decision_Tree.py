@@ -12,13 +12,14 @@ class DTree:
     split_criterion_ENTROPY = "Entropie"
 
     def __init__(self, dataset, max_tree_depth, min_element_number_for_node, min_purity_level,
-                 selected_split_criterion):
+                 selected_split_criterion, split_only_for_information_gain_greater_zero):
         self.tree_graphic = None
         self.root = None
         Node.node_number = 0
         label_column = [row[-1] for row in dataset[1:]]
 
-        number_of_elements_in_max_class = max(Decision_Tree_Utils.countOccourence(label_column).values())
+        dict_occurrences_labels = Decision_Tree_Utils.countOccourence(label_column)
+        number_of_elements_in_max_class = max(dict_occurrences_labels.values())
 
         # Datensatz bereits rein oder es gibt keine Attribute außer dem Label...
         # Der Baum besteht dann nur aus dem Wurzelknoten
@@ -30,7 +31,8 @@ class DTree:
                 or Decision_Tree_Utils.stop_criterion_purity_level_reached(min_purity_level=min_purity_level,
                                                                            number_of_elements_in_max_class=number_of_elements_in_max_class,
                                                                            number_of_elements_in_node=len(dataset) - 1):
-            self.root = LeaveNode(attribute=dataset[1][-1], edge_label="", dataset=dataset,
+            label_of_max_class = max(dict_occurrences_labels, key=dict_occurrences_labels.get)
+            self.root = LeaveNode(attribute=label_of_max_class, edge_label="", dataset=dataset,
                                   elements_in_max_class=number_of_elements_in_max_class)
 
 
@@ -46,20 +48,31 @@ class DTree:
                 # Standard: Fehler zählen
                 split_criterion_for_tree = Decision_Tree_Utils.split_criterion_misclassification_count
 
-            best_attribute, information_gains = Decision_Tree_Utils.calculate_best_attribute(
-                split_criterion=split_criterion_for_tree, header=dataset[0],
-                data=dataset[1:])
-            self.root = InnerNode(attribute=best_attribute, information_gains=information_gains, edge_label="",
-                                  dataset=dataset, elements_in_max_class=number_of_elements_in_max_class)
+            best_attribute, information_gain_best_attribute, information_gains = \
+                Decision_Tree_Utils.calculate_best_attribute(split_criterion=split_criterion_for_tree,
+                                                             header=dataset[0],
+                                                             data=dataset[1:])
+            # Unterscheidung, dass bei nur bei einem echten Informationsgewinn weiter aufgeteilt wird
+            # Falls der Informationsgewinn 0 ist, wird ein Blatt mit dem maximal vorkommenden Label erzeugt
+            if split_only_for_information_gain_greater_zero == 1 and information_gain_best_attribute == 0:
+                label_of_max_class = max(dict_occurrences_labels, key=dict_occurrences_labels.get)
+                self.root = LeaveNode(attribute=label_of_max_class, edge_label="", dataset=dataset,
+                                      elements_in_max_class=number_of_elements_in_max_class)
+            # Falls die entsprechende Auswahl nicht aktiviert oder der Informationsgewinn größer 0 ist, wird weiter
+            # aufgeteilt
+            else:
+                self.root = InnerNode(attribute=best_attribute, information_gains=information_gains, edge_label="",
+                                      dataset=dataset, elements_in_max_class=number_of_elements_in_max_class)
 
-            splitted_data = Decision_Tree_Utils.split_data_by_attribute(self.root.node_dataset, best_attribute)
-            for set in splitted_data:
-                self.root.node_children.append(self.root.build_tree(dataset=set[1], edge_label=set[0],
-                                                                    split_criterion=split_criterion_for_tree,
-                                                                    current_tree_depth=1,
-                                                                    max_tree_depth=max_tree_depth,
-                                                                    min_element_number_for_node=min_element_number_for_node,
-                                                                    min_purity_level=min_purity_level))
+                splitted_data = Decision_Tree_Utils.split_data_by_attribute(self.root.node_dataset, best_attribute)
+                for d_elm in splitted_data:
+                    self.root.node_children.append(self.root.build_tree(dataset=d_elm[1], edge_label=d_elm[0],
+                                                                        split_criterion=split_criterion_for_tree,
+                                                                        current_tree_depth=1,
+                                                                        max_tree_depth=max_tree_depth,
+                                                                        min_element_number_for_node=min_element_number_for_node,
+                                                                        min_purity_level=min_purity_level,
+                                                                        split_only_for_information_gain_greater_zero=split_only_for_information_gain_greater_zero))
 
     def print_tree_preorder(self):
         self.root.print_tree_preorder()
@@ -115,7 +128,7 @@ class DTree:
 class Node:
     node_number = 0
 
-    def __init__(self, attribute="", edge_label="", dataset=None, elements_in_max_class=0):
+    def __init__(self, dataset, attribute, edge_label, elements_in_max_class=0):
         self.node_number = Node.node_number
         Node.node_number += 1
         # Bestes Attribut
@@ -129,10 +142,10 @@ class Node:
         self.node_children = []
 
     def build_tree(self, dataset, split_criterion, current_tree_depth, max_tree_depth, min_purity_level,
-                   min_element_number_for_node,
-                   edge_label):
+                   min_element_number_for_node, edge_label, split_only_for_information_gain_greater_zero):
         label_column = [d[-1] for d in dataset[1:]]
-        number_of_elements_in_max_class = max(Decision_Tree_Utils.countOccourence(label_column).values())
+        dict_occurrences_labels = Decision_Tree_Utils.countOccourence(label_column)
+        number_of_elements_in_max_class = max(dict_occurrences_labels.values())
 
         if Decision_Tree_Utils.stop_criterion_is_dataset_pure(label_column=label_column) \
                 or Decision_Tree_Utils.stop_criterion_no_attributes_to_split_left(dataset=dataset) \
@@ -143,31 +156,40 @@ class Node:
                 or Decision_Tree_Utils.stop_criterion_purity_level_reached(min_purity_level=min_purity_level,
                                                                            number_of_elements_in_max_class=number_of_elements_in_max_class,
                                                                            number_of_elements_in_node=len(dataset) - 1):
-            temp = LeaveNode(attribute=dataset[1][-1], edge_label=edge_label, dataset=dataset,
+            label_of_max_class = max(dict_occurrences_labels, key=dict_occurrences_labels.get)
+            return LeaveNode(attribute=label_of_max_class, edge_label=edge_label, dataset=dataset,
                              elements_in_max_class=number_of_elements_in_max_class)
-
-            return temp
         else:
-            best_attribute, information_gains = Decision_Tree_Utils.calculate_best_attribute(
-                split_criterion=split_criterion, header=dataset[0],
-                data=dataset[1:])
-            temp = InnerNode(attribute=best_attribute, information_gains=information_gains, edge_label=edge_label,
-                             dataset=dataset, elements_in_max_class=number_of_elements_in_max_class)
+            best_attribute, information_gain_best_attribute, information_gains = \
+                Decision_Tree_Utils.calculate_best_attribute(split_criterion=split_criterion, header=dataset[0],
+                                                             data=dataset[1:])
+            # Unterscheidung, dass bei nur bei einem echten Informationsgewinn weiter aufgeteilt wird
+            # Falls der Informationsgewinn 0 ist, wird ein Blatt mit dem maximal vorkommenden Label erzeugt
+            if split_only_for_information_gain_greater_zero == 1 and information_gain_best_attribute == 0:
+                label_of_max_class = max(dict_occurrences_labels, key=dict_occurrences_labels.get)
+                return LeaveNode(attribute=label_of_max_class, edge_label=edge_label, dataset=dataset,
+                                 elements_in_max_class=number_of_elements_in_max_class)
+            # Falls die entsprechende Auswahl nicht aktiviert oder der Informationsgewinn größer 0 ist, wird weiter
+            # aufgeteilt
+            else:
+                temp = InnerNode(attribute=best_attribute, information_gains=information_gains, edge_label=edge_label,
+                                 dataset=dataset, elements_in_max_class=number_of_elements_in_max_class)
 
-            splitted_data = Decision_Tree_Utils.split_data_by_attribute(dataset=temp.node_dataset,
-                                                                        split_attribute=temp.node_attribute)
-            for set in splitted_data:
-                temp.node_children.append(temp.build_tree(dataset=set[1], edge_label=set[0],
-                                                          split_criterion=split_criterion,
-                                                          current_tree_depth=current_tree_depth + 1,
-                                                          max_tree_depth=max_tree_depth,
-                                                          min_element_number_for_node=min_element_number_for_node,
-                                                          min_purity_level=min_purity_level))
-            return temp
+                splitted_data = Decision_Tree_Utils.split_data_by_attribute(dataset=temp.node_dataset,
+                                                                            split_attribute=temp.node_attribute)
+                for d_elm in splitted_data:
+                    temp.node_children.append(temp.build_tree(dataset=d_elm[1], edge_label=d_elm[0],
+                                                              split_criterion=split_criterion,
+                                                              current_tree_depth=current_tree_depth + 1,
+                                                              max_tree_depth=max_tree_depth,
+                                                              min_element_number_for_node=min_element_number_for_node,
+                                                              min_purity_level=min_purity_level,
+                                                              split_only_for_information_gain_greater_zero=split_only_for_information_gain_greater_zero))
+                return temp
 
 
 class InnerNode(Node):
-    def __init__(self, attribute="", information_gains=None, edge_label="", dataset=None, elements_in_max_class=0):
+    def __init__(self, dataset, attribute, edge_label, information_gains=None, elements_in_max_class=0):
         super().__init__(attribute=attribute, edge_label=edge_label, dataset=dataset,
                          elements_in_max_class=elements_in_max_class)
         self.node_children = []
@@ -208,7 +230,7 @@ class InnerNode(Node):
 
 
 class LeaveNode(Node):
-    def __init__(self, attribute="", edge_label="", dataset=None, elements_in_max_class=0):
+    def __init__(self, attribute, dataset, edge_label, elements_in_max_class=0):
         super().__init__(attribute=attribute, edge_label=edge_label, dataset=dataset,
                          elements_in_max_class=elements_in_max_class)
 

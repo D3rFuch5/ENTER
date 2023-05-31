@@ -9,8 +9,4 @@ def split_data_according_to_ratio(data, ratio, do_shuffle=False):
         random.shuffle(data)
     dataset_ratio = data[0:number_of_elements_ratio]
     dataset_rest = data[number_of_elements_ratio:]
-    if dataset_ratio == []:
-        dataset_ratio = [[]]
-    if dataset_rest == []:
-        dataset_rest = [[]]
     return dataset_ratio, dataset_rest

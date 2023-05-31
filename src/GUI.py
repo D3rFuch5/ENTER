@@ -1,5 +1,4 @@
 import platform
-import sys
 import tkinter as tk
 import tkinter.ttk as ttk
 
@@ -20,7 +19,7 @@ class GUI_Main_Window:
     split_criterion_ENTROPY = "Entropie"
 
     path_WINDOWS_icon_image = ".\Grafiken\Icon_simple_dtree.png"
-    path_MAC_icon_image = "./Grafiken/Icon_simple_dtree.png"
+    path_MAC_icon_image = "./Grafiken/Logo_Enter.png"
 
     path_WINDOWS_startup_image = ".\Grafiken\default_tree_image.png"
     path_MAC_startup_image = "./Grafiken/default_tree_image.png"
@@ -31,7 +30,7 @@ class GUI_Main_Window:
     def __init__(self, main_object):
         self.main_object = main_object
         self.main_window = tk.Tk()
-        self.main_window.title("Entscheidungsbaum Simulator - Beta 1.2")
+        self.main_window.title("ENTER_ENTscheidungsbaum-ERsteller - Beta 1.3")
         # Setze Fenstergröße auf minimal sinnvolle Größe
         self.main_window.geometry("1000x650")
         self.main_window.wm_minsize(920, 500)
@@ -53,6 +52,8 @@ class GUI_Main_Window:
                                    tk.PhotoImage(file=path))
 
         app_style.configure('.', font=default_FONT)
+
+        app_style.configure("BoldLabel.TLabel", font=default_FONT_BOLD)
 
         app_style.configure("TNotebook.Tab", foreground="blue", font=default_FONT_ITALIC, padding=[2, 2])
 
@@ -90,7 +91,11 @@ class GUI_Main_Window:
 
         self.frm_controls = None
         self.frm_choose_split_criterion = None
+        self.lbl_text_other_settings = None
         self.com_box_split_criterion_selection = None
+        self.lbl_text_split_criteria = None
+        self.use_only_split_for_real_information_gain = None
+        self.ck_btn_split_for_information_gain_zero = None
 
         self.frm_choose_hyperparameter = None
         self.ck_btn_hyperparameter_tree_depth = None
@@ -196,6 +201,8 @@ class GUI_Main_Window:
     def init_gui_controls(self):
         self.selected_split_criterion = tk.StringVar(master=self.main_window)
 
+        self.use_only_split_for_real_information_gain = tk.IntVar()
+
         self.use_hyperparameter_tree_depth = tk.IntVar()
         self.use_hyperparameter_purity_level = tk.IntVar()
         self.use_hyperparameter_min_elements_in_set = tk.IntVar()
@@ -223,9 +230,13 @@ class GUI_Main_Window:
         self.frm_controls.columnconfigure(3, weight=1)
 
         # Oberfläche der Auswahl des Splitkriteriums
-        self.frm_choose_split_criterion = tk.LabelFrame(master=self.frm_controls, text="Splitkriterium ausw\u00E4hlen",
+        self.frm_choose_split_criterion = tk.LabelFrame(master=self.frm_controls, text="Informationsgewinn",
                                                         font=default_FONT_BOLD)
         self.frm_choose_split_criterion.grid(column=0, row=0, sticky="nsew", padx=(1, 0))
+
+        self.lbl_text_split_criteria = ttk.Label(master=self.frm_choose_split_criterion, text="Split-Kriterium:",
+                                                 style="BoldLabel.TLabel")
+        self.lbl_text_split_criteria.grid(column=0, row=0, sticky="nw")
 
         self.com_box_split_criterion_selection = ttk.Combobox(master=self.frm_choose_split_criterion, state="readonly",
                                                               width=25, font=default_FONT_SMALL,
@@ -235,8 +246,19 @@ class GUI_Main_Window:
                                                                       self.split_criterion_GINI_IMPURITY,
                                                                       self.split_criterion_ENTROPY])
         self.com_box_split_criterion_selection.current(0)
+        self.com_box_split_criterion_selection.grid(column=0, row=1, sticky="nw", padx=(2, 2))
 
-        self.com_box_split_criterion_selection.pack(side=tk.LEFT, padx=(2, 2), pady=5, anchor=tk.N)
+        self.lbl_text_other_settings = ttk.Label(master=self.frm_choose_split_criterion, text="Weitere Einstellungen:",
+                                                 style="BoldLabel.TLabel")
+        self.lbl_text_other_settings.grid(column=0, row=2, sticky="sw", pady=(7, 0))
+
+        self.ck_btn_split_for_information_gain_zero = ttk.Checkbutton(master=self.frm_choose_split_criterion,
+                                                                      text="Nur bei Informations- \ngewinn > 0 aufteilen",
+                                                                      takefocus=0,
+                                                                      variable=self.use_only_split_for_real_information_gain,
+                                                                      onvalue=1,
+                                                                      offvalue=0)
+        self.ck_btn_split_for_information_gain_zero.grid(column=0, row=3, sticky="sw")
 
         # Oberfläche der Hyperparameterauswahl
         self.frm_choose_hyperparameter = tk.LabelFrame(master=self.frm_controls,
@@ -255,10 +277,12 @@ class GUI_Main_Window:
 
         self.etr_max_tree_depth = ttk.Entry(master=self.frm_choose_hyperparameter, width=10,
                                             textvariable=self.entered_tree_depth)
-        self.etr_max_tree_depth.grid(column=1, row=0, sticky="nw", padx=(0, 5))
+        self.etr_max_tree_depth.grid(column=1, row=0, sticky="w", padx=(0, 5))
 
         self.ck_btn_hyperparameter_purity_level = ttk.Checkbutton(master=self.frm_choose_hyperparameter,
-                                                                  text="Reinheit des Knoten in %: ", takefocus=0,
+                                                                  text="Minimale Reinheit in \u0025 "
+                                                                       "\nf\u00fcr Klassifikation: ",
+                                                                  takefocus=0,
                                                                   variable=self.use_hyperparameter_purity_level,
                                                                   onvalue=1,
                                                                   offvalue=0)
@@ -267,10 +291,10 @@ class GUI_Main_Window:
 
         self.etr_purity_level = ttk.Entry(master=self.frm_choose_hyperparameter, width=10,
                                           textvariable=self.entered_purity_level)
-        self.etr_purity_level.grid(column=1, row=1, sticky="nw", padx=(0, 5))
+        self.etr_purity_level.grid(column=1, row=1, sticky="w", padx=(0, 5))
 
         self.ck_btn_hyperparameter_min_elements_in_set = ttk.Checkbutton(master=self.frm_choose_hyperparameter,
-                                                                         text="Minimale Elementanzahl\nin Knoten f\u00fcr Aufteilung: ",
+                                                                         text="Minimale Elementanzahl \nin Knoten: ",
                                                                          takefocus=0,
                                                                          variable=self.use_hyperparameter_min_elements_in_set,
                                                                          onvalue=1,
@@ -283,7 +307,6 @@ class GUI_Main_Window:
         self.etr_min_elements_in_set.grid(column=1, row=2, sticky="w", padx=(0, 5))
 
         # Oberfläche DataSampler
-
         self.frm_data_sampling = tk.LabelFrame(master=self.frm_controls,
                                                text="Autom. Datenaufteilung",
                                                font=default_FONT_BOLD)
@@ -305,13 +328,13 @@ class GUI_Main_Window:
         self.etr_training_data_ratio.grid(column=1, row=0, sticky="nw", padx=(0, 5))
 
         self.ck_btn_shuffle_on_tree_creation = ttk.Checkbutton(master=self.frm_data_sampling,
-                                                               text="Neuverteilung bei Baumerstellung", takefocus=0,
+                                                               text="Daten neu mischen bei Baumerstellung", takefocus=0,
                                                                variable=self.use_shuffle_on_tree_creation,
                                                                onvalue=1,
                                                                offvalue=0,
                                                                command=self.main_object.call_data_sampling_shuffle_on_tree_creation)
         self.use_shuffle_on_tree_creation.set(0)
-        self.ck_btn_shuffle_on_tree_creation.grid(column=0, row=1, sticky="nw")
+        self.ck_btn_shuffle_on_tree_creation.grid(column=0, row=1, sticky="nw", columnspan=2)
 
         # Oberfläche der Trainings- und Testbuttons
         self.frm_train_test_control = tk.LabelFrame(master=self.frm_controls,
@@ -325,7 +348,7 @@ class GUI_Main_Window:
         self.btn_train_tree.grid(column=0, row=0, sticky='ew')
 
         self.ck_btn_show_display_split_dataset = ttk.Checkbutton(master=self.frm_train_test_control,
-                                                                 text="Baumdetails anzeigen",
+                                                                 text="Knotendetails anzeigen",
                                                                  variable=self.show_window_node_details, onvalue=1,
                                                                  offvalue=0,
                                                                  command=self.main_object.call_show_window_node_details)
@@ -333,7 +356,7 @@ class GUI_Main_Window:
         self.ck_btn_show_display_split_dataset.grid(column=0, row=1, sticky="nw")
 
         self.btn_initiate_testing = ttk.Button(master=self.frm_train_test_control, text="Testmodus aktivieren",
-                                               command=self.main_object.call_activate_testing_phase)
+                                               command=self.main_object.call_activate_test_phase)
         self.btn_initiate_testing.grid(column=0, row=2, sticky="sew", pady=(0, 2))
         self.frm_train_test_control.columnconfigure(0, weight=1)
         self.frm_train_test_control.rowconfigure(2, weight=1)
@@ -372,7 +395,7 @@ class GUI_Main_Window:
         self.frm_display_training_data_container.pack(fill="both", expand=True)
 
         self.frm_display_training_data = tk.LabelFrame(master=self.frm_display_training_data_container,
-                                                       text="Geladene Trainingsdaten:",
+                                                       text="Geladene Trainingsdaten(0 Elemente):",
                                                        font=default_FONT_BOLD, borderwidth=0)
 
         self.frm_display_training_data.grid(column=0, row=0, sticky="nsew", pady=(5, 0))
@@ -488,7 +511,8 @@ class GUI_Main_Window:
         self.btn_run_testing.grid(column=0, row=0, sticky="ew")
 
         # Frame zur Anzeige der Testdaten
-        self.frm_display_test_data = tk.LabelFrame(master=self.frm_display_test_phase_container, text="Testdaten: ",
+        self.frm_display_test_data = tk.LabelFrame(master=self.frm_display_test_phase_container,
+                                                   text="Testdaten(0 Elemente): ",
                                                    font=default_FONT_BOLD, borderwidth=0)
         self.frm_display_test_data.grid(column=0, row=1, sticky="nsew", padx=(2, 0), pady=(15, 0))
         # Damit sich die Treeview zur Anzeige der Testdaten immer maximal ausdehnt
@@ -781,7 +805,15 @@ class GUI_Main_Window:
         self.etr_min_elements_in_set['state'] = usage_status
         self.ck_btn_use_data_sampling['state'] = usage_status
         self.ck_btn_shuffle_on_tree_creation['state'] = usage_status
-        self.etr_training_data_ratio['state'] = usage_status
+        self.ck_btn_split_for_information_gain_zero['state'] = usage_status
+
+        # Falls das Data Sampling aktiv war/ist, wurde eine korrekte Aufteilungsrate eingelesen und die Eingabe soll
+        # weiterhin gesperrt bleiben, da nur bei Aktivierung des Data Sampling geprüft wird
+        if self.use_data_sampling.get() == 1:
+            self.etr_training_data_ratio['state'] = tk.DISABLED
+        else:
+            self.etr_training_data_ratio['state'] = usage_status
+
         self.btn_train_tree['state'] = usage_status
 
     def adapt_gui_for_data_sampler(self, enable_data_sampling):
@@ -793,8 +825,10 @@ class GUI_Main_Window:
 
 # Helper-Methoden
 def display_treeview_from_beginning(treeview):
-    first = treeview.get_children()[0]
-    treeview.see(first)
+    treeview_elements = treeview.get_children()
+    if treeview_elements != ():
+        treeview.see(treeview_elements[0])
+
 
 def build_confusion_matrix(containing_frame, number_of_labels, matrix_entries, tk_description_label_list,
                            tk_label_list):
@@ -913,15 +947,15 @@ def clear_treeview(treeview):
         treeview.delete(child)
 
 
-def fill_treeview_with_data(treeview, data):
+def fill_treeview_with_data(treeview, dataset):
     # Anzahl der Columns über die Elemente im Header festlegen
-    treeview["columns"] = data[0]
+    treeview["columns"] = dataset[0]
 
     # Headerwerte anzeigen
     treeview['show'] = 'headings'
 
-    # Brechnung der Spaltenbreite in Abhängigkeit von der Fensterbreite
-    num_of_columns = len(data[0])
+    # Berechnung der Spaltenbreite in Abhängigkeit von der Fensterbreite
+    num_of_columns = len(dataset[0])
     # Sorgt für der leeren Treeview auf Treeviewbreite
     if num_of_columns == 0:
         num_of_columns = 1
@@ -929,14 +963,14 @@ def fill_treeview_with_data(treeview, data):
     col_width = treeview.winfo_width() // num_of_columns
 
     # Layout der Headerzeile festlegen und Werte in die Headerzeile speichern
-    for d in data[0]:
+    for d in dataset[0]:
         treeview.column(column=d, minwidth=200, width=col_width, anchor='c', stretch=True)
         treeview.heading(column=d, text=str(d))
 
     even_flag = "even"
 
     # Befüllen der Treeview-Tabelle mit den Werten
-    for d in data[1:]:
+    for d in dataset[1:]:
         treeview.insert(parent="", index='end', text="L1", values=d, tags=even_flag)
         if even_flag == "even":
             even_flag = "odd"
@@ -1062,7 +1096,7 @@ class GUI_Node_Details_Window:
         self.frm_display_information_gains.columnconfigure(0, weight=1)
         self.frm_display_information_gains.rowconfigure(1, weight=1)
 
-        self.frm_display_information_gains.grid(column=0, row=1, padx=(5, 0), sticky="ew", pady=(15, 0))
+        self.frm_display_information_gains.grid(column=0, row=1, padx=(5, 5), sticky="ew", pady=(15, 0))
 
         self.frm_display_best_attribute = tk.Frame(master=self.frm_display_information_gains)
         self.frm_display_best_attribute.grid(column=0, row=0, sticky="nsew")
@@ -1091,45 +1125,8 @@ class GUI_Node_Details_Window:
         self.treeview_information_gains.configure(
             xscrollcommand=self.scrollbar_horizontal_display_information_gains.set)
 
-    def display_information_gains(self, current_node, type_InnerNode):
-        # Einblenden der Oberfläche für die Informationsgewinne, wenn der aktuell betrachtete Knoten ein innerer
-        # Knoten ist
-        if isinstance(current_node, type_InnerNode):
-            self.frm_display_information_gains.grid(column=0, row=1, padx=(5, 0), pady=(15, 0), sticky="ew")
-
-            self.lbl_best_attribute_value['text'] = current_node.node_attribute
-
-            # Leeren des Treeview
-            for child in self.treeview_information_gains.get_children():
-                self.treeview_information_gains.delete(child)
-
-            attributes = [" "] + list(current_node.node_information_gains.keys())
-            info_gains = ["Informationsgewinn"] + ['{:f}'.format(ig) for ig in
-                                                   list(current_node.node_information_gains.values())]
-
-            # Anzahl der Columns über die Elemente im Header festlegen
-            self.treeview_information_gains["columns"] = attributes
-
-            # Headerwerte anzeigen
-            self.treeview_information_gains['show'] = 'headings'
-
-            col_width = self.treeview_information_gains.winfo_width() // len(attributes)
-
-            # Layout der Headerzeile festlegen und Werte in die Headerzeile speichern
-            for d in attributes:
-                self.treeview_information_gains.column(column=d, minwidth=200, width=col_width, anchor='c',
-                                                       stretch=True)
-                self.treeview_information_gains.heading(column=d, text=str(d))
-
-            # Befüllen der Treeview-Tabelle mit den Werten
-            self.treeview_information_gains.insert(parent="", index='end', text="L1", values=info_gains)
-
-        # Falls es sich um einen Blattknoten handelt, werden keine Informationsgewinne angezeigt
-        else:
-            self.frm_display_information_gains.grid_forget()
-
     def init_gui_node_details_display_data(self):
-        self.frm_display_data = tk.LabelFrame(master=self.window, text="Daten des Knoten:",
+        self.frm_display_data = tk.LabelFrame(master=self.window, text="Daten des Knotens(0 Elemente):",
                                               font=default_FONT_BOLD, borderwidth=0)
 
         self.frm_display_data.grid(column=0, row=2, sticky="nsew", pady=(5, 0), padx=(5, 0))
@@ -1157,20 +1154,58 @@ class GUI_Node_Details_Window:
 
         self.treeview_data.configure(xscrollcommand=self.scrollbar_horizontal_display_data.set)
 
+    def fill_information_gains_and_best_attribute(self, current_node):
+        self.lbl_best_attribute_value['text'] = current_node.node_attribute
+
+        attributes = [" "] + list(current_node.node_information_gains.keys())
+        info_gains = ["Informationsgewinn"] + ['{:f}'.format(ig) for ig in
+                                               list(current_node.node_information_gains.values())]
+
+        # Anzahl der Columns über die Elemente im Header festlegen
+        self.treeview_information_gains["columns"] = attributes
+
+        # Headerwerte anzeigen
+        self.treeview_information_gains['show'] = 'headings'
+
+        col_width = self.treeview_information_gains.winfo_width() // len(attributes)
+
+        # Layout der Headerzeile festlegen und Werte in die Headerzeile speichern
+        for d in attributes:
+            self.treeview_information_gains.column(column=d, minwidth=200, width=col_width, anchor='c',
+                                                   stretch=True)
+            self.treeview_information_gains.heading(column=d, text=str(d))
+
+        # Befüllen der Treeview-Tabelle mit den Werten
+        self.treeview_information_gains.insert(parent="", index='end', text="L1", values=info_gains)
+
     def show_node_details_window(self):
         self.window.deiconify()
 
     def close_node_details_window(self, main_gui):
+        """
+        Schließt das Fenster zur Anzeige der Knotendetails und setzt es auf den Initialzustand zurück
+        :param main_gui: Referenz auf das Hauptfenster; wird benötigt, damit auch die Checkbox "Knotendetails anzeigen"
+                         "unset" wird
+        """
+        # Häkchen in Checkbox entfernen
         main_gui.show_window_node_details.set(0)
 
+        # Daten zurücksetzen
         self.entered_node_number.set("")
         self.lbl_best_attribute_value['text'] = " "
 
         # Leeren des Treeview treeview_information_gains
-        for child in self.treeview_information_gains.get_children():
-            self.treeview_information_gains.delete(child)
+        clear_treeview(treeview=self.treeview_information_gains)
 
         # Leeren des Treeview treeview_data
-        for child in self.treeview_data.get_children():
-            self.treeview_data.delete(child)
+        clear_treeview(treeview=self.treeview_data)
+
+        # Hinzufügen der Anzeige der Informationsgewinne, falls vor Schließen des Fensters ein Blatt angezeigt wurde
+        # und diese Anzeige somit entfernt wurde
+        self.frm_display_information_gains.grid(column=0, row=1, padx=(5, 5), sticky="ew", pady=(15, 0))
+
+        # Zurücksetzen der Anzeige der Elementanzahl der Knotendatensatzes
+        self.frm_display_data['text'] = "Daten des Knotens(0 Elemente):"
+
+        # Ausblenden des Fensters
         self.window.withdraw()
