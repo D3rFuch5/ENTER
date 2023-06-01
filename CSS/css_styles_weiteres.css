@@ -138,12 +138,11 @@ nav {
 }
 
 h1{
-    font-family: 'Comic Sans MS', sans-serif;
+    font-family: 'Comic Sans MS', cursive;
     font-weight: bold;
     font-size: 35px;
     color: black;
 }
-
 
 h2{
     margin-bottom: 5px;
@@ -153,29 +152,29 @@ h2{
     color: black;
 }
 
-h3{
-    margin-bottom: 5px;
-    font-family: 'Comic Sans MS', cursive;
-    font-weight: bold;
-    font-size: 20px;
-    color: black;
-}
-
 p{
     text-align: justify;
     line-height: 1.5;
 }
 
+.image_in_text{
+    width: 200px;
+    height: auto;
+    float: right;
+    margin: 15px;
+}
+
+.screenshot{
+    display: block;
+    margin: 20px auto;
+    max-width: 90%;
+    height: auto;
+}
 
 .list_item{
     line-height: 1.5;
     margin-left: 5%;
     margin-top: 10px;
-}
-
-.list_item_no_dots{
-    margin-left: 0;
-    list-style-type: none;
 }
 
 .link_text{
@@ -203,4 +202,3 @@ p{
     color: #3fd7f2;
     background-color: #273345;
 }
-
