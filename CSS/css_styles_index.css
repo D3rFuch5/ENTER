@@ -39,7 +39,7 @@ nav {
 }
 
 #schriftzug_ENTER {
-    font-family: 'Comic Sans MS', serif;
+    font-family: 'Comic Sans MS', 'Verdana', sans-serif;
     font-weight: bold;
     font-size: 25px;
     color: white;
@@ -138,7 +138,7 @@ nav {
 }
 
 h1{
-    font-family: 'Comic Sans MS', cursive;
+    font-family: 'Comic Sans MS', 'Verdana', sans-serif;
     font-weight: bold;
     font-size: 35px;
     color: black;
@@ -146,7 +146,7 @@ h1{
 
 h2{
     margin-bottom: 5px;
-    font-family: 'Comic Sans MS', cursive;
+    font-family: 'Comic Sans MS', 'Verdana', sans-serif;
     font-weight: bold;
     font-size: 30px;
     color: black;

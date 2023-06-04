@@ -39,7 +39,7 @@ nav {
 }
 
 #schriftzug_ENTER {
-    font-family: 'Comic Sans MS', serif;
+    font-family: 'Comic Sans MS', 'Verdana', sans-serif;
     font-weight: bold;
     font-size: 25px;
     color: white;
@@ -71,7 +71,7 @@ nav {
     text-decoration-thickness: 3px;
 }
 
-.other_tab{
+.other_tab {
     color: white;
     font-weight: normal;
     text-decoration: none;
@@ -105,7 +105,6 @@ nav {
 }
 
 
-
 /* Dropdown content (hidden by default) */
 .dropdown-content {
     display: none;
@@ -113,7 +112,7 @@ nav {
     background-color: #273345;;
     min-width: 120px;
     margin-top: 20px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
     z-index: 1;
 }
 
@@ -132,61 +131,61 @@ nav {
     display: block;
 }
 
-#div_site_body{
+#div_site_body {
     margin-left: 5%;
     margin-right: 5%;
 }
 
-h1{
-    font-family: 'Comic Sans MS', cursive;
+h1 {
+    font-family: 'Comic Sans MS', 'Verdana', sans-serif;
     font-weight: bold;
     font-size: 35px;
     color: black;
 }
 
-h2{
+h2 {
     margin-bottom: 5px;
-    font-family: 'Comic Sans MS', cursive;
+    font-family: 'Comic Sans MS', 'Verdana', sans-serif;
     font-weight: bold;
     font-size: 30px;
     color: black;
 }
 
-p{
+p {
     text-align: justify;
     line-height: 1.5;
 }
 
-.image_in_text{
+.image_in_text {
     width: 200px;
     height: auto;
     float: right;
     margin: 15px;
 }
 
-.screenshot{
+.screenshot {
     display: block;
     margin: 20px auto;
     max-width: 90%;
     height: auto;
 }
 
-.list_item{
+.list_item {
     line-height: 1.5;
     margin-left: 5%;
     margin-top: 10px;
 }
 
-.link_text{
+.link_text {
     color: blue;
     text-decoration: none;
 }
 
-.link_text:hover{
+.link_text:hover {
     text-decoration: underline;
 }
 
-.link_btn{
+.link_btn {
     margin-top: 2px;
     margin-bottom: 2px;
     background-color: #374355;
@@ -198,7 +197,7 @@ p{
     display: inline-block;
 }
 
-.link_btn:hover{
+.link_btn:hover {
     color: #3fd7f2;
     background-color: #273345;
 }
