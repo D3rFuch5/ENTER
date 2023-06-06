@@ -33,9 +33,13 @@ nav {
 
 }
 
-#div_ENTER {
+#home_ENTER {
     display: flex;
     align-items: center;
+}
+
+#home_ENTER:link, #home_ENTER:visited, #home_ENTER:hover, #home_ENTER:active{
+    text-decoration: none;
 }
 
 #schriftzug_ENTER {

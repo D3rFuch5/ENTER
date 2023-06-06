@@ -9,10 +9,10 @@
 </head>
 <body>
 <nav>
-    <div id="div_ENTER">
+    <a id="home_ENTER" href="../index.html">
         <img id="logo_ENTER" src="../pictures/Logo_Enter.png" alt="Logo der Software ENTER">
         <span id="schriftzug_ENTER">ENTER</span>
-    </div>
+    </a>
     <div id="navigation_bar">
         <a class="other_tab level_one_tab" href="../index.html">Start</a>
         <div class="dropdown">
@@ -72,8 +72,7 @@
             <br>
             <p>
                 Der ENTER benötigt für die Darstellung des Entscheidungsbaums in graphischer Form im Hintergrund eine
-                Installation der Software Graphviz bzw. deren Bibliotheken. Diese lässt sich einfach und einmalig mit
-                Hilfe
+                Installation der Software Graphviz bzw. deren Bibliotheken. Diese lässt sich einfach mit Hilfe
                 des von Graphviz zur Verfügung gestellten Installers installieren.
             <ol>
                 <li class="list_item">
@@ -195,7 +194,8 @@
     <p>
         Mit Hilfe des Pakets PyInstaller (<a class="link_text" href="https://pyinstaller.org/en/stable/" target="_blank"
                                              rel="noopener noreferrer">https://pyinstaller.org/en/stable/</a>) ist es
-        möglich aus PythonSkripten ausführbare Dateien für Windows und MacOS zu erstellen. Eine solche ausführbare Datei
+        möglich aus Python-Skripten ausführbare Dateien für Windows und MacOS zu erstellen. Eine solche ausführbare
+        Datei
         kann auf einem beliebigen Rechner des jeweiligen Systems ausgeführt werden, ohne dass dafür eine Installation
         von Python oder zusätzlicher Pakete notwendig ist, da diese in der ausführbaren Datei „gebündelt“ werden. Die
         Installation der Graphviz-Software muss dennoch auf dem Rechner vorhanden sein, da diese nicht in
@@ -205,19 +205,18 @@
     </p>
     <ul>
         <li class="list_item_nested_list"><b>Installation des PyInstallers:</b><br>
-            Öffnen Sie eine Konsole und geben dort den Befehl
+            Öffnen Sie eine Konsole und geben Sie dort den Befehl
             <div class="center">
                 <code> pip install pyinstaller</code>
             </div>
-            ein und bestätigen Sie den Befehl mit der Eingabetaste. Das Paket Pyinstaller wird nun automatisch
+            ein. Bestätigen Sie den Befehl mit der Eingabetaste. Das Paket Pyinstaller wird nun automatisch
             heruntergeladen und installiert.<br>
             <br>
         </li>
         <li class="list_item_nested_list"><b>Erstellen einer ausführbaren <i>.exe</i>-Datei</is>:</b><br>
             <ol>
                 <li class="list_item">Öffnen Sie die Konsole <i>im Ordner</i> des Entscheidungsbaum-Erstellers, d.h. in
-                    dem
-                    sich die Datei <span class="bold_courier">Starte_ENTER.py</span> befindet.
+                    dem Ordner, in dem sich die Datei <span class="bold_courier">Starte_ENTER.py</span> befindet.
                 </li>
                 <li class="list_item">Geben Sie den Befehl
                     <div class="center grey"><code>pyinstaller ––noconfirm ––windowed ––onefile<br>
@@ -304,8 +303,8 @@
                 <li class="list_item">Durch Klick auf den Button <i>Testmodus aktivieren</i> wird das Testen des
                     trainierten Entscheidungsbaums ermöglicht.
                 </li>
-                <li class="list_item">Laden Sie in der <i>Ansicht Testphase</i> die Testdaten durch Klick auf den Button<i>Öffnen</i>
-                    in den ENTER. Diese werden nun unter <i>Testdaten</i> angezeigt.
+                <li class="list_item">Laden Sie in der <i>Ansicht Testphase</i> die Testdaten durch Klick auf den Button
+                    <i>Öffnen</i> in den ENTER. Diese werden nun unter <i>Testdaten</i> angezeigt.
                 </li>
                 <li class="list_item">Durch Klick auf den Button <i>Ausführen</i> werden die geladenen Testdaten mit dem
                     trainierten Entscheidungsbaum ausgewertet und es wird jeweils das vom Baum berechnete Label mit dem
@@ -323,8 +322,8 @@
         </li>
         <li class="list_item_nested_list"><b>Automatische Datenaufteilung:</b><br>
             <ol>
-                <li class="list_item">Laden Sie einen Datensatz, welchen Sie als Trainings- und Testdatensatz in den
-                    ENTER durch Klick auf den Button <i>Öffnen</i>.
+                <li class="list_item">Laden Sie einen Datensatz, welchen Sie als Trainings- und Testdatensatz verwenden
+                    möchten, durch Klick auf den Button <i>Öffnen</i> in den ENTER.
                 </li>
                 <li class="list_item">Geben Sie im Bereich <i>Autom. Datenaufteilung</i> den Prozentsatz ein, welcher
                     für die Trainingsdaten aus dem geladenen Datensatz verwendet werden soll.<br> Aktivieren Sie dann
