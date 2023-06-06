@@ -2,42 +2,15 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script type="module" src="JavaScript/Header.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="icon" type="image/png" href="pictures/Icon_ENTER.png">
-    <link rel="stylesheet" href="CSS/css_styles_index.css">
+    <link rel="stylesheet" href="CSS/css_styles_global_site_style.css">
+    <link rel="stylesheet" href="CSS/css_style_header.css">
     <title>ENTER Entscheidungsbaumersteller</title>
 </head>
 <body>
-<nav>
-    <div id="div_ENTER">
-        <img id="logo_ENTER" src="pictures/Logo_Enter.png" alt="Logo der Software ENTER">
-        <span id="schriftzug_ENTER">ENTER</span>
-    </div>
-    <div id="navigation_bar">
-        <a id="current_tab" class="level_one_tab" href="index.html">Start</a>
-        <div class="dropdown">
-            <a class="other_tab level_one_tab" href="HTML/Anleitungen.html">Anleitungen
-                <i class="fa fa-caret-down"></i>
-            </a>
-            <div class="dropdown-content">
-                <a class="other_tab" href="HTML/Anleitungen.html#ENTER_Voraussetzungen">Voraussetzungen</a>
-                <a class="other_tab" href="HTML/Anleitungen.html#ENTER_Start">Starten</a>
-                <a class="other_tab" href="HTML/Anleitungen.html#ENTER_Funktionen">Funktionen</a>
-            </div>
-        </div>
-        <a class="other_tab level_one_tab" href="HTML/Downloads.html">Downloads</a>
-        <div class="dropdown">
-            <a class="other_tab level_one_tab" href="HTML/Weiteres.html">Weiteres
-                <i class="fa fa-caret-down"></i>
-            </a>
-            <div class="dropdown-content">
-                <a class="other_tab" href="HTML/Weiteres.html#Abschnitt_Perzeptron_Simulator">Perzeptron-Simulator</a>
-                <a class="other_tab" href="HTML/Weiteres.html#Abschnitt_kNN">k-nächster-Nachbar-Algorithmus</a>
-            </div>
-        </div>
-    </div>
-    <img id="logo_entwickler" src="pictures/logo_fuchs_wolf.png" alt="Logo der Entwickler">
-</nav>
+<header-component></header-component>
 <br>
 <div id="div_site_body">
     <h1>ENTscheidungsbaum-ERsteller ENTER</h1>
@@ -76,18 +49,17 @@
             <p>
                 Im Anschluss daran kann im Rahmen der Testphase die Vorhersagequalität des erstellten
                 Entschscheidungsbaums bewertet werden. Dafür können Testdaten unter Verwendung des Baums ausgewertet
-                werden und
-                die berechneten Ergebnisse mit dem erwarteten Ergebnissen verglichen werden. Die Ergebnisse lassen sich
-                übersichtlich in Form einer Konfusionsmatrix einsehen. Des Weiteren kann das Gütemaß Genauigkeit
-                angezeigt
-                werden, mit welchem die Vorhersagequalität des Entscheidungsbaums bewertet werden kann.
+                und die berechneten Ergebnisse mit den erwarteten Ergebnissen verglichen werden. Die Ergebnisse lassen
+                sich übersichtlich in Form einer Konfusionsmatrix einsehen. Des Weiteren kann das Gütemaß Genauigkeit
+                angezeigt werden, welches als Anhaltspunkt für die Güte der Vorhersagequalität des Entscheidungsbaums
+                herangezogen werden kann.
             </p>
         </li>
         <li class="list_item"><b>Automatische Datenaufteilung:</b><br>
             <p>
                 Der ENTER bietet die Möglichkeit einen geladenen Datensatz automatisch in Trainings- und Testdaten
-                aufzuteilen,
-                was es vereinfacht den Einfluss verschiedener Trainingsdaten auf die Modellerstellung zu untersuchen.
+                aufzuteilen, was es vereinfacht den Einfluss verschiedener Trainingsdaten auf die Modellerstellung zu
+                untersuchen.
             </p>
         </li>
     </ul>
@@ -95,16 +67,14 @@
     <p>
         Für die Verwendung des ENTERs können Sie entweder von uns vorbereitete Datensätze verwenden oder aber auch
         eigene Datensätze in den ENTER laden. Diese müssen in Form von <i>.csv</i>-Dateien vorliegen. Genauere
-        Informationen
-        hierzu finden Sie im Bereich <a class="link_text" HREF="HTML/Anleitungen.html">Anleitungen</a> oder im Handbuch
-        zum ENTER im
-        <a class="link_text" href="HTML/Downloads.html">Downloadbereich</a>.
+        Informationen hierzu finden Sie im Bereich <a class="link_text" HREF="Anleitungen.html">Anleitungen</a>
+        oder im Handbuch zum ENTER im <a class="link_text" href="Downloads.html">Downloadbereich</a>.
     </p>
     <img class="screenshot" src="pictures/Screenshot_ENTER_01.png" alt="Screenshot des Entscheidungsbaumerstellers">
     <br>
     <h2>Versionshinweise: Neu im ENTER Beta 1.3</h2>
     <ul>
-        <li class="list_item">Anzeige der Elementanzahl der geladenen Datensätze(Trainings- un Testdaten)</li>
+        <li class="list_item">Anzeige der Elementanzahl der geladenen Datensätze(Trainings- und Testdaten)</li>
         <li class="list_item">Verkürzung der Anzeige des Dateipfads eines geladenen Datensatzes auf dem Dateinamen</li>
         <li class="list_item">Überarbeitung der GUI in Bezug auf Benennungen und Layout.
         </li>
