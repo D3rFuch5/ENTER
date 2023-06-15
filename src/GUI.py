@@ -19,7 +19,7 @@ class GUI_Main_Window:
     split_criterion_ENTROPY = "Entropie"
 
     path_WINDOWS_icon_image = ".\Grafiken\Icon_simple_dtree.png"
-    path_MAC_icon_image = "./Grafiken/Logo_Enter.png"
+    path_MAC_icon_image = "./Grafiken/Icon_simple_dtree.png"
 
     path_WINDOWS_startup_image = ".\Grafiken\default_tree_image.png"
     path_MAC_startup_image = "./Grafiken/default_tree_image.png"
