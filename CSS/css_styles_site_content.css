@@ -123,3 +123,12 @@ code{
 .grey{
     background-color: #DDDDDD;
 }
+
+.link_spacing::before {
+  display: block;
+  content: " ";
+  margin-top: -80px;
+  height: 80px;
+  visibility: hidden;
+  pointer-events: none;
+}
