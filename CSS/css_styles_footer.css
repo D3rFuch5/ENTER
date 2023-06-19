@@ -1,0 +1,21 @@
+footer{
+    margin-top: 50px;
+    margin-bottom:10px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#footer_elements{
+    margin-left: auto;
+    margin-right: auto;
+
+}
+
+.footer_link:hover, .footer_link:active,.footer_link:visited, .footer_link:link{
+    color: #CCCCCC;
+    text-decoration: none;
+    padding-left: 5px;
+    padding-right: 5px;
+}
